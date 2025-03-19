@@ -8,13 +8,22 @@
 </head>
 <body>
     <header>
+        <a href="#" class="logo">
+            <img src="images/paw-logo.png" alt="Modern Dog Sitting Logo">
+            <span>Modern Dog Sitting</span>
+        </a>
         <nav>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <ul>
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#testimonials">Testimonials</a></li>
                 <li><a href="#faq">FAQ</a></li>
-                <li><a href="#contact">Contact</a></li>
             </ul>
+            <a href="#contact" class="contact-button">Contact Us</a>
         </nav>
     </header>
     <main>
@@ -25,7 +34,7 @@
         </section>
         <section class="gallery">
             <img src="images/image1.png" alt="Dog sitting image 1">
-            <img src="images/image2.png" alt="Dog sitting image 2">
+            <img src="images/image2.png" alt="Dog sitting image 2" style="height: 475px;">
             <img src="images/image3.png" alt="Dog sitting image 3">
         </section>
         <section id="experience">
@@ -35,7 +44,6 @@
                     <ul>
                         <li>3+ years of professional dog walking experience</li>
                         <li>Experience with dogs of all ages and sizes</li>
-                        <li>Specialized in French Bulldogs and Pomeranians</li>
                         <li>Trained in handling medical needs</li>
                         <li>Experience with puppies and senior dogs</li>
                     </ul>
@@ -46,48 +54,127 @@
                 </div>
             </div>
         </section>
+        <section id="testimonials">
+            <h2>What Our Clients Say</h2>
+            <div class="testimonials-container">
+                <!-- Middle-length testimonial (Stephanie & Tod) -->
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">
+                            <span class="testimonial-preview">We absolutely adore our dog sitters Steven & Mary! They provide exceptional care and attention to our sweet basset hound, Waffles, ensuring he feels loved and safe while we're away.</span>
+                            <span class="testimonial-full">
+                                <br><br>
+                                Their dedication and kindness have given us complete peace of mind, and we couldn't be more grateful for their wonderful service.
+                            </span>
+                        </p>
+                        <button class="read-more-btn">Read more</button>
+                        <div class="testimonial-author">
+                            <p class="author-name">Stephanie & Tod</p>
+                            <p class="author-location"><!-- Add location here (optional) --></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Longest testimonial (Sonia) -->
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">
+                            <span class="testimonial-preview">Steven and Mary Pecksen are always my first choice for house and dog sitters. No one else is even a close second. Why? They care!</span>
+                            <span class="testimonial-full">
+                                <br><br>
+                                They have cared for my quirky French Bulldog many times over the last four years. They lavish her with great walks, lots of cuddles, and only the food/treats she needs.
+                                <br><br>
+                                They care about my home, always leaving it as clean (if not cleaner) than it was when I left. They care enough to send regular updates whilst independently problem solving to avoid interrupting valuable family time.
+                                <br><br>
+                                My advice... book this dynamic duo early to avoid disappointment.
+                            </span>
+                        </p>
+                        <button class="read-more-btn">Read more</button>
+                        <div class="testimonial-author">
+                            <p class="author-name">Sonia</p>
+                            <p class="author-location"><!-- Add location here (optional) --></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Long testimonial (Ian & Ellie) -->
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">
+                            <span class="testimonial-preview">Steven and Mary are always our first choice to take care of our dog, and they always do an amazing job. Their care and attention make it so much easier to be away, knowing our pup is in great hands.</span>
+                            <span class="testimonial-full">
+                                <br><br>
+                                One of the things we appreciate most is how they keep us updated throughout the stay. They always send pictures, which gives us extra peace of mind and is such a thoughtful touch. It's clear they genuinely care about the pets they look after.
+                                <br><br>
+                                On top of that, our house is always spotless when we return. It's such a great feeling to come home to a clean space and a happy dog.
+                                <br><br>
+                                We highly recommend Steven and Mary to anyone looking for reliable, caring, and professional pet sitters!
+                            </span>
+                        </p>
+                        <button class="read-more-btn">Read more</button>
+                        <div class="testimonial-author">
+                            <p class="author-name">Ian & Ellie</p>
+                            <p class="author-location"><!-- Add location here (optional) --></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section id="faq">
             <h2>Frequently Asked Questions</h2>
             <div class="faq-item">
-                <h3>Why do you require a consultation before booking?</h3>
-                <p>We want to ensure we are a good fit for your pet's needs.</p>
+                <h3 class="faq-question">Why do you require a consultation before booking?</h3>
+                <div class="faq-answer">
+                    <p>We want to ensure we are a good fit for your pet's needs.</p>
+                </div>
             </div>
             <div class="faq-item">
-                <h3>What's included in your house-sitting service?</h3>
-                <p>We provide feeding, walking, and companionship for your pet.</p>
+                <h3 class="faq-question">What's included in your house-sitting service?</h3>
+                <div class="faq-answer">
+                    <p>We provide feeding, walking, and companionship for your pet.</p>
+                </div>
             </div>
             <div class="faq-item">
-                <h3>How long can you stay at our home?</h3>
-                <p>We offer flexible scheduling to meet your needs.</p>
+                <h3 class="faq-question">How long can you stay at our home?</h3>
+                <div class="faq-answer">
+                    <p>We offer flexible scheduling to meet your needs.</p>
+                </div>
             </div>
             <div class="faq-item">
-                <h3>Are you insured and bonded?</h3>
-                <p>Yes, we are fully insured and bonded for your peace of mind.</p>
+                <h3 class="faq-question">What happens in case of a pet emergency?</h3>
+                <div class="faq-answer">
+                    <p>We are trained to handle emergencies and will contact you immediately.</p>
+                </div>
             </div>
             <div class="faq-item">
-                <h3>What happens in case of a pet emergency?</h3>
-                <p>We are trained to handle emergencies and will contact you immediately.</p>
-            </div>
-            <div class="faq-item">
-                <h3>How do you handle updates during our absence?</h3>
-                <p>We provide regular updates and photos of your pet.</p>
+                <h3 class="faq-question">How do you handle updates during our absence?</h3>
+                <div class="faq-answer">
+                    <p>We provide regular updates and photos of your pet.</p>
+                </div>
             </div>
         </section>
         <section id="contact">
-            <h2>Book Your Free Consultation</h2>
             <form>
-                <input type="text" name="name" placeholder="Your name" required>
-                <input type="email" name="email" placeholder="Your email" required>
-                <input type="tel" name="phone" placeholder="Your phone number" required>
-                <input type="text" name="dates" placeholder="Preferred dates" required>
+                <h2>Book Your Free Consultation</h2>
+                <p>Let's see if we're a good fit for each other!</p>
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="tel" name="phone" placeholder="Your Phone Number" required>
+                <input type="text" name="dates" placeholder="Your House-Sit Dates (From & To)" required>
                 <textarea name="message" placeholder="Tell us about your pets" required></textarea>
-                <button type="submit">Request Consultation</button>
+                <button type="submit">Submit</button>
+                <p class="form-footer">We can't wait to meet you and your fur-baby!</p>
             </form>
-            <p>Note: Due to high demand, we are currently only able to provide care for dogs.</p>
         </section>
     </main>
     <footer>
-        <p>&copy; 2025 Modern Dog Sitting. All rights reserved.</p>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="images/paw-logo.png" alt="Modern Dog Sitting Logo">
+                <span>Modern Dog Sitting</span>
+            </div>
+            <p>&copy; 2025 Modern Dog Sitting. All rights reserved.</p>
+        </div>
     </footer>
     <script src="scripts.js"></script>
 </body>
