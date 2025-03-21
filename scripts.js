@@ -50,5 +50,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.textContent = 'Read less';
             }
         });
+<<<<<<< HEAD
     });
 });
+=======
+>>>>>>> origin/main
