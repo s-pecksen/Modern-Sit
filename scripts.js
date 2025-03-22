@@ -16,11 +16,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add click event listeners to FAQ questions
+    // Update FAQ functionality
     const faqQuestions = document.querySelectorAll('.faq-question');
     
     faqQuestions.forEach(question => {
-        question.addEventListener('click', function() {
+        question.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent any default behavior
+            
+            // Toggle active class on the question
+            this.classList.toggle('active');
+            
+            // Toggle the visibility of the answer
+            const answer = this.nextElementSibling;
+            if (answer.style.maxHeight) {
+                answer.style.maxHeight = null;
+            } else {
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            }
+        });
+
+        // Add touch event listener for mobile devices
+        question.addEventListener('touchend', function(e) {
+            e.preventDefault(); // Prevent default touch behavior
+            
             // Toggle active class on the question
             this.classList.toggle('active');
             
@@ -50,8 +68,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.textContent = 'Read less';
             }
         });
-<<<<<<< HEAD
     });
 });
-=======
->>>>>>> origin/main
