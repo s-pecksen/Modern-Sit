@@ -16,12 +16,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+<<<<<<< HEAD
     // Add click and touch event listeners to FAQ questions
     const faqQuestions = document.querySelectorAll('.faq-question');
     
     faqQuestions.forEach(question => {
         // Function to toggle FAQ answer
         const toggleAnswer = () => {
+=======
+    // Update FAQ functionality
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    
+    faqQuestions.forEach(question => {
+        question.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent any default behavior
+            
+            // Toggle active class on the question
+            this.classList.toggle('active');
+            
+            // Toggle the visibility of the answer
+            const answer = this.nextElementSibling;
+            if (answer.style.maxHeight) {
+                answer.style.maxHeight = null;
+            } else {
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            }
+        });
+
+        // Add touch event listener for mobile devices
+        question.addEventListener('touchend', function(e) {
+            e.preventDefault(); // Prevent default touch behavior
+            
+>>>>>>> origin/main
             // Toggle active class on the question
             question.classList.toggle('active');
             
