@@ -1,7 +1,5 @@
 # Modern Dog Sitting
 
-<<<<<<< HEAD
-=======
 Modern Sit Dog Care is a husband-wife team of experienced dog/house-sitters who value communication, alignment, and holistic health for everyone in the family, fur-babies especially.
 
 ## Services Offered
@@ -121,4 +119,3 @@ Modern Sit Dog Care is a husband-wife team of experienced dog/house-sitters who 
 - **Testimonials**: Visit our website to read genuine feedback from our many satisfied clients
   
 - **Detailed FAQ**: Check out our website's FAQ section for answers to common questions about our services
->>>>>>> origin/main
