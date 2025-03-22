@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add click event listeners to FAQ questions
+    // Updated FAQ functionality
     const faqQuestions = document.querySelectorAll('.faq-question');
     
     faqQuestions.forEach(question => {
@@ -24,8 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Toggle active class on the question
             this.classList.toggle('active');
             
-            // Toggle the visibility of the answer
+            // Get the answer element
             const answer = this.nextElementSibling;
+            
+            // Toggle the answer visibility
             if (answer.style.maxHeight) {
                 answer.style.maxHeight = null;
             } else {
@@ -50,8 +52,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.textContent = 'Read less';
             }
         });
-<<<<<<< HEAD
     });
 });
-=======
->>>>>>> origin/main
