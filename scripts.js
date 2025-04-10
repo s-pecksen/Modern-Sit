@@ -84,9 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return; 
     }
 
-    // NEW: Select the arrow button
-    const nextButton = testimonialsWrapper.querySelector('.testimonial-scroll-arrow.right');
-
     let originalTestimonials = Array.from(testimonialsContainer.children); 
 
     if (originalTestimonials.length > 0) {
@@ -99,13 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let clones = []; 
         let scrollEndTimer = null; 
 
-        // NEW: Function to enable/disable button
-        const updateButtonState = () => {
-            if (nextButton) {
-                // Disable button if all items are visible or fewer
-                nextButton.disabled = totalOriginalItems <= itemsToShow; 
-                 console.log(`Button state update: disabled=${nextButton.disabled}`);
+        // NEW: Function to update wrapper class based on scrollability
+        const updateScrollability = () => {
+            const canScroll = totalOriginalItems > itemsToShow;
+            if (canScroll) {
+                testimonialsWrapper.classList.add('has-scroll-next');
+            } else {
+                testimonialsWrapper.classList.remove('has-scroll-next');
             }
+             console.log(`Scrollability update: Can scroll = ${canScroll}`);
         };
 
         const setupCarousel = () => {
@@ -119,37 +118,46 @@ document.addEventListener('DOMContentLoaded', () => {
              console.log(`Found ${totalOriginalItems} original testimonials.`);
 
             if (totalOriginalItems === 0) {
-                console.log("No original testimonials found to setup.");
-                 updateButtonState(); // Ensure button is disabled if no items
-                return;
-            }
+                 console.log("No original testimonials found to setup.");
+                 updateScrollability(); // Ensure class is removed if no items
+                 return;
+             }
 
             const containerStyle = window.getComputedStyle(testimonialsContainer);
             gap = parseFloat(containerStyle.gap) || 30;
-            testimonialWidth = originalTestimonials[0].offsetWidth; 
-            console.log(`Calculated testimonialWidth: ${testimonialWidth}px, gap: ${gap}px`);
-            const wrapperWidth = testimonialsWrapper.clientWidth; 
-            itemsToShow = Math.max(1, Math.floor((wrapperWidth + gap) / (testimonialWidth + gap)));
-             console.log(`Wrapper width: ${wrapperWidth}px, Items to show: ${itemsToShow}`);
+            // Ensure width is calculated *after* potential CSS changes affecting it
+             requestAnimationFrame(() => { // Use requestAnimationFrame to wait for layout
+                 if (originalTestimonials.length > 0) {
+                    testimonialWidth = originalTestimonials[0].offsetWidth; 
+                     console.log(`Calculated testimonialWidth: ${testimonialWidth}px, gap: ${gap}px`);
+                 } else {
+                     testimonialWidth = 350; // Fallback
+                 }
 
-             if (totalOriginalItems > itemsToShow) { 
-                console.log(`Cloning first ${itemsToShow} items for infinite loop.`);
-                for (let i = 0; i < itemsToShow; i++) {
-                    if (i < totalOriginalItems) { 
-                        const clone = originalTestimonials[i].cloneNode(true);
-                        clone.classList.add('clone');
-                        clone.setAttribute('aria-hidden', 'true'); 
-                        testimonialsContainer.appendChild(clone);
-                        clones.push(clone);
+                 const wrapperWidth = testimonialsWrapper.clientWidth; 
+                 itemsToShow = Math.max(1, Math.floor((wrapperWidth + gap) / (testimonialWidth + gap)));
+                 console.log(`Wrapper width: ${wrapperWidth}px, Items to show: ${itemsToShow}`);
+
+                 // Duplication (Keep this part as is)
+                 if (totalOriginalItems > itemsToShow) { 
+                    console.log(`Cloning first ${itemsToShow} items for infinite loop.`);
+                    for (let i = 0; i < itemsToShow; i++) {
+                        if (i < totalOriginalItems) { 
+                            const clone = originalTestimonials[i].cloneNode(true);
+                            clone.classList.add('clone');
+                            clone.setAttribute('aria-hidden', 'true'); 
+                            testimonialsContainer.appendChild(clone);
+                            clones.push(clone);
+                        }
                     }
-                }
-            } else {
-                 console.log("Not cloning items - all items fit or not enough items.");
-             }
-             
-             testimonialsContainer.scrollLeft = 0; 
-             updateButtonState(); // Update button state after setup
-             console.log("Carousel setup complete.");
+                 } else {
+                     console.log("Not cloning items - all items fit or not enough items.");
+                 }
+                 
+                 testimonialsContainer.scrollLeft = 0; 
+                 updateScrollability(); // Add/remove class based on calculation
+                 console.log("Carousel setup complete.");
+             });
         };
 
         const handleScrollEnd = () => {
@@ -162,26 +170,20 @@ document.addEventListener('DOMContentLoaded', () => {
                  testimonialsContainer.scrollTo({ left: 0, behavior: 'auto' }); 
              } 
              isScrolling = false; 
+             updateScrollability(); // Check if class needs update after scroll
              console.log("isScrolling reset to false.");
-             // Update button state after scroll finishes in case it affects visibility
-             updateButtonState(); 
         };
 
 
         const scrollNext = () => {
-            updateButtonState(); // Ensure state is current
-
-            // *** ADD DETAILED LOGGING FOR THE BLOCK CONDITION ***
-            if (isScrolling || (nextButton && nextButton.disabled)) { 
-                console.log(
-                    `Scroll attempt blocked: isScrolling=${isScrolling}, buttonExists=${!!nextButton}, buttonDisabled=${nextButton ? nextButton.disabled : 'N/A'}`
-                );
-                return; // Stop if scrolling or button is disabled
+            // Check scrollability based on wrapper class or calculation
+            const canScroll = totalOriginalItems > itemsToShow; 
+            if (isScrolling || !canScroll) { 
+                console.log(`Scroll attempt blocked: isScrolling=${isScrolling}, canScroll=${canScroll}`);
+                return; 
             }
-            // If we get past the block, log that scrolling is starting
             console.log("Scroll conditions met. Starting scroll..."); 
-            
-            isScrolling = true; // Set scrolling flag
+            isScrolling = true; 
 
             const scrollAmount = testimonialWidth + gap;
              clearTimeout(scrollEndTimer); 
@@ -189,16 +191,28 @@ document.addEventListener('DOMContentLoaded', () => {
              scrollEndTimer = setTimeout(handleScrollEnd, 500); 
         };
         
-        // --- NEW Click Trigger for the Arrow Button ---
-        if (nextButton) {
-            nextButton.addEventListener('click', () => {
-                console.log("Next button clicked.");
-                scrollNext();
-            });
-        } else {
-             console.error("Scroll next button '.testimonial-scroll-arrow.right' not found!");
-        }
+        // --- NEW Click Trigger on the WRAPPER ---
+        testimonialsWrapper.addEventListener('click', (event) => {
+             // Prevent clicks on buttons/links inside testimonials from triggering scroll
+             if (event.target.closest('.testimonial a, .testimonial button')) {
+                 console.log("Clicked on a link/button inside testimonial, ignoring scroll trigger.");
+                 return;
+             }
 
+             // Check if the click is within the area of the ::after pseudo-element
+             const wrapperRect = testimonialsWrapper.getBoundingClientRect();
+             const arrowWidth = 35; // The width set in CSS for ::after
+             const paddingRight = parseFloat(window.getComputedStyle(testimonialsWrapper).paddingRight); // Get actual padding
+             
+             // Calculate the rough horizontal start position of the arrow
+             const arrowStartsAt = wrapperRect.right - paddingRight; // Arrow lives within padding
+
+             // Check if click is horizontally within the padding/arrow area
+             if (event.clientX >= arrowStartsAt && event.clientX <= wrapperRect.right) {
+                  console.log("Click detected in arrow region.");
+                  scrollNext();
+             }
+        });
 
         // --- Resize Handling ---
         let resizeTimer;
@@ -207,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 console.log("Executing resize handler.");
-                setupCarousel(); // This will also call updateButtonState
+                setupCarousel(); // Recalculates dimensions, itemsToShow, and updates scrollability
             }, 250);
         });
 
@@ -216,8 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } else {
         console.log("No testimonials found in the container.");
-         // Ensure button is disabled if container is initially empty
-         if(nextButton) nextButton.disabled = true;
+         // Ensure class is removed if no items initially
+         testimonialsWrapper.classList.remove('has-scroll-next');
     }
 
 }); // End DOMContentLoaded

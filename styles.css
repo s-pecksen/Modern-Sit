@@ -355,33 +355,29 @@ nav ul li a:hover::after {
     background-color: #FF9966; /* Existing */
 }
 
-/* Wrapper hides the overflow */
+/* Wrapper hides the overflow and positions the arrow */
 .testimonials-wrapper {
-    position: relative;
-    /* Max-width calculation might need adjustment if padding changes significantly */
+    position: relative; /* Needed for absolute positioning of ::after */
     max-width: 1140px; 
     margin: 0 auto;
     overflow: hidden; 
-    /* INCREASE right padding to make space for the button */
-    padding: 0 60px 0 15px; /* e.g., 60px on the right, 15px on left */
+    /* Add padding on the right to ensure content doesn't go under the arrow */
+    padding: 0 60px 0 15px; /* Increased right padding */
     box-sizing: border-box;
 }
 
-/* Container holds all cards (originals + duplicates) */
+/* Container holds all cards and scrolls */
 .testimonials-container {
     display: flex;
     gap: 30px; 
     padding-bottom: 20px; 
     margin: 0; 
-    /* REMOVE overflow-x: scroll to disable manual scrolling */
-    /* overflow-x: scroll; */ 
-    -ms-overflow-style: none;  /* Hide scrollbar (IE/Edge) */
-    scrollbar-width: none;  /* Hide scrollbar (Firefox) */
-    /* Keep overscroll-behavior if you like the edge effect */
+    /* Keep scroll enabled but hidden */
+    overflow-x: scroll; 
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
     overscroll-behavior-x: contain; 
 }
-
-/* Hide scrollbar for Chrome, Safari, and Opera */
 .testimonials-container::-webkit-scrollbar {
     display: none;
 }
@@ -475,70 +471,63 @@ nav ul li a:hover::after {
     margin: 5px 0 0 0; /* Existing */
 }
 
-/* Arrow button styles */
-.testimonial-scroll-arrow {
+/* NEW: Arrow Button styled on the WRAPPER */
+.testimonials-wrapper::after {
+    content: '›'; /* Arrow character */
     position: absolute;
     top: 50%;
+    /* Position inside the right padding */
+    right: 10px; 
     transform: translateY(-50%);
     z-index: 10; 
     background-color: rgba(255, 153, 102, 0.8); 
     color: white;
     border: none;
-    border-radius: 50%; 
-    width: 45px; 
-    height: 45px;
-    font-size: 28px; 
+    /* Style to look like a tab/button */
+    border-radius: 8px; /* Adjust as desired */
+    width: 35px; 
+    height: 60px; 
+    font-size: 30px; 
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
     display: flex; 
     align-items: center;
     justify-content: center;
     line-height: 1; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    
+    /* Initially hidden - JS will show it via a class */
+    opacity: 0;
+    pointer-events: none; 
 }
 
-.testimonial-scroll-arrow.right {
-    right: 10px; /* Position it within the new right padding */
+/* NEW: Class added by JS to show the arrow */
+.testimonials-wrapper.has-scroll-next::after {
+    opacity: 1;
+    pointer-events: auto; /* Make clickable */
 }
 
-.testimonial-scroll-arrow:hover {
-    background-color: rgba(255, 128, 64, 0.9); /* Darker on hover */
-    transform: translateY(-50%) scale(1.05); /* Slight grow effect */
-}
-
-/* Style for when button should be disabled (e.g., not enough items) */
-.testimonial-scroll-arrow:disabled { 
-    opacity: 0.4;
-    cursor: not-allowed;
-    pointer-events: none; /* Prevent clicks */
+/* Optional: Hover state for the wrapper's arrow */
+.testimonials-wrapper.has-scroll-next:hover::after {
+     background-color: rgba(255, 128, 64, 0.9); 
 }
 
 /* --- Responsive Adjustments for Wrapper --- */
-/* Adjust max-width and padding in media queries if necessary */
+/* Ensure padding is adjusted */
 @media (max-width: 1200px) { 
     .testimonials-wrapper {
-        /* Recalculate max-width based on 2 items + 1 gap + L/R padding */
-        /* (2 * 350px) + 30px + 15px + 60px = 700 + 30 + 75 = 805px */
         max-width: 805px; 
-        padding: 0 50px 0 15px; /* Adjust padding if needed */
+        padding: 0 50px 0 15px; 
     }
-    .testimonial-scroll-arrow.right {
-        right: 5px; /* Adjust position slightly */
-    }
+    .testimonials-wrapper::after { right: 5px; /* Adjust position */ }
 }
-
 @media (max-width: 820px) { 
      .testimonials-wrapper {
-        /* Recalculate max-width based on 1 item + L/R padding */
-        /* 350px + 15px + 60px = 425px */
         max-width: 425px; 
-        padding: 0 45px 0 15px; /* Adjust padding */
+        padding: 0 45px 0 15px; 
     }
-     .testimonial-scroll-arrow.right {
-        right: 5px; /* Adjust position slightly */
-    }
-     /* Optional centering for single card might need adjustment */
+     .testimonials-wrapper::after { right: 5px; /* Adjust position */ }
 }
 
 @media (max-width: 480px) {
