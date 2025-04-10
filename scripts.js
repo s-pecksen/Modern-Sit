@@ -78,44 +78,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Testimonial Infinite Carousel Logic ---
     const testimonialsWrapper = document.querySelector('.testimonials-wrapper');
     const testimonialsContainer = document.querySelector('.testimonials-container');
-    
+    const mobileMediaQuery = window.matchMedia('(max-width: 768px)'); // Media query for mobile check
+
     if (!testimonialsWrapper || !testimonialsContainer) {
         console.error("Testimonial wrapper or container not found.");
-        return; 
+        return;
     }
 
-    let originalTestimonials = Array.from(testimonialsContainer.children); 
+    let originalTestimonials = Array.from(testimonialsContainer.children);
 
     if (originalTestimonials.length > 0) {
-        
-        let itemsToShow = 3; 
-        let testimonialWidth = 350; 
-        let gap = 30; 
-        let totalOriginalItems = originalTestimonials.length;
-        let isScrolling = false; 
-        let clones = []; 
-        let scrollEndTimer = null; 
 
-        // NEW: Function to update wrapper class based on scrollability
+        let itemsToShow = 3;
+        let testimonialWidth = 350;
+        let gap = 30;
+        let totalOriginalItems = originalTestimonials.length;
+        let isScrolling = false;
+        let clones = [];
+        let scrollEndTimer = null;
+
+        // Function to update wrapper class based on scrollability and device type
         const updateScrollability = () => {
-            const canScroll = totalOriginalItems > itemsToShow;
-            if (canScroll) {
-                testimonialsWrapper.classList.add('has-scroll-next');
-            } else {
+            const isMobile = mobileMediaQuery.matches;
+            const canScrollDesktop = totalOriginalItems > itemsToShow;
+
+            if (isMobile) {
                 testimonialsWrapper.classList.remove('has-scroll-next');
+                console.log("Scrollability update (Mobile): Hiding arrow.");
+            } else {
+                if (canScrollDesktop) {
+                    testimonialsWrapper.classList.add('has-scroll-next');
+                    console.log("Scrollability update (Desktop): Showing arrow.");
+                } else {
+                    testimonialsWrapper.classList.remove('has-scroll-next');
+                    console.log("Scrollability update (Desktop): Hiding arrow (not enough items).");
+                }
             }
-             console.log(`Scrollability update: Can scroll = ${canScroll}`);
         };
 
         const setupCarousel = () => {
             console.log("Setting up carousel...");
             isScrolling = false;
-            clearTimeout(scrollEndTimer); 
-            clones.forEach(clone => clone.remove());
-            clones = [];
-             originalTestimonials = Array.from(testimonialsContainer.querySelectorAll('.testimonial:not(.clone)'));
-             totalOriginalItems = originalTestimonials.length;
-             console.log(`Found ${totalOriginalItems} original testimonials.`);
+            clearTimeout(scrollEndTimer);
+            clones.forEach(clone => clone.remove()); // Remove previous clones
+            clones = []; // Reset clones array
+            // Ensure we only select non-cloned items for recalculation
+            originalTestimonials = Array.from(testimonialsContainer.querySelectorAll('.testimonial:not(.clone)'));
+            totalOriginalItems = originalTestimonials.length;
+            console.log(`Found ${totalOriginalItems} original testimonials.`);
 
             if (totalOriginalItems === 0) {
                  console.log("No original testimonials found to setup.");
@@ -125,113 +135,167 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const containerStyle = window.getComputedStyle(testimonialsContainer);
             gap = parseFloat(containerStyle.gap) || 30;
-            // Ensure width is calculated *after* potential CSS changes affecting it
-             requestAnimationFrame(() => { // Use requestAnimationFrame to wait for layout
-                 if (originalTestimonials.length > 0) {
-                    testimonialWidth = originalTestimonials[0].offsetWidth; 
-                     console.log(`Calculated testimonialWidth: ${testimonialWidth}px, gap: ${gap}px`);
-                 } else {
-                     testimonialWidth = 350; // Fallback
-                 }
 
-                 const wrapperWidth = testimonialsWrapper.clientWidth; 
-                 itemsToShow = Math.max(1, Math.floor((wrapperWidth + gap) / (testimonialWidth + gap)));
-                 console.log(`Wrapper width: ${wrapperWidth}px, Items to show: ${itemsToShow}`);
+            requestAnimationFrame(() => { // Use requestAnimationFrame to wait for layout
+                if (originalTestimonials.length > 0) {
+                    testimonialWidth = originalTestimonials[0].offsetWidth;
+                    console.log(`Calculated testimonialWidth: ${testimonialWidth}px, gap: ${gap}px`);
+                } else {
+                    testimonialWidth = 350; // Fallback
+                }
 
-                 // Duplication (Keep this part as is)
-                 if (totalOriginalItems > itemsToShow) { 
-                    console.log(`Cloning first ${itemsToShow} items for infinite loop.`);
+                const wrapperWidth = testimonialsWrapper.clientWidth;
+                itemsToShow = Math.max(1, Math.floor((wrapperWidth + gap) / (testimonialWidth + gap)));
+                console.log(`Wrapper width: ${wrapperWidth}px, Items to show: ${itemsToShow}`);
+
+                const isMobile = mobileMediaQuery.matches;
+                console.log(`Is mobile? ${isMobile}`);
+
+                // Cloning logic only for desktop when needed
+                if (!isMobile && totalOriginalItems > itemsToShow) {
+                    console.log(`Cloning first ${itemsToShow} items for infinite loop (Desktop).`);
                     for (let i = 0; i < itemsToShow; i++) {
-                        if (i < totalOriginalItems) { 
+                        if (i < totalOriginalItems) {
                             const clone = originalTestimonials[i].cloneNode(true);
                             clone.classList.add('clone');
-                            clone.setAttribute('aria-hidden', 'true'); 
+                            clone.setAttribute('aria-hidden', 'true');
                             testimonialsContainer.appendChild(clone);
                             clones.push(clone);
                         }
                     }
-                 } else {
-                     console.log("Not cloning items - all items fit or not enough items.");
-                 }
-                 
-                 testimonialsContainer.scrollLeft = 0; 
-                 updateScrollability(); // Add/remove class based on calculation
-                 console.log("Carousel setup complete.");
-             });
+                } else if (isMobile) {
+                    console.log("Not cloning items (Mobile).");
+                } else {
+                    console.log("Not cloning items - all items fit or not enough items (Desktop).");
+                }
+
+                testimonialsContainer.scrollLeft = 0; // Reset scroll position
+                updateScrollability(); // Add/remove class based on calculation and device
+                console.log("Carousel setup complete.");
+            });
         };
 
         const handleScrollEnd = () => {
-             const scrollAmountOneItem = testimonialWidth + gap;
-             const loopResetTargetScrollLeft = totalOriginalItems * scrollAmountOneItem; 
-             console.log(`Scroll check: scrollLeft=${testimonialsContainer.scrollLeft}, targetThreshold=${loopResetTargetScrollLeft}`);
+            const isMobile = mobileMediaQuery.matches;
+            if (isMobile) {
+                isScrolling = false; // Still reset flag in case it was somehow set
+                console.log("Scroll end ignored (Mobile). isScrolling reset.");
+                return; // Don't perform infinite loop reset on mobile
+            }
 
-             if (testimonialsContainer.scrollLeft >= loopResetTargetScrollLeft - 10) { 
+            // Desktop-only infinite scroll reset logic
+            const scrollAmountOneItem = testimonialWidth + gap;
+            const loopResetTargetScrollLeft = totalOriginalItems * scrollAmountOneItem;
+            console.log(`Scroll check: scrollLeft=${testimonialsContainer.scrollLeft}, targetThreshold=${loopResetTargetScrollLeft}`);
+
+            if (testimonialsContainer.scrollLeft >= loopResetTargetScrollLeft - 10) { // Use a small buffer
                 console.log("Loop forward threshold reached. Resetting scroll to beginning.");
-                 testimonialsContainer.scrollTo({ left: 0, behavior: 'auto' }); 
-             } 
-             isScrolling = false; 
-             updateScrollability(); // Check if class needs update after scroll
-             console.log("isScrolling reset to false.");
+                // Use 'auto' for instant jump, 'smooth' causes issues here
+                testimonialsContainer.scrollTo({ left: 0, behavior: 'auto' });
+            }
+            isScrolling = false;
+            // No need to call updateScrollability here unless items change dynamically
+            console.log("isScrolling reset to false.");
         };
 
 
         const scrollNext = () => {
-            // Check scrollability based on wrapper class or calculation
-            const canScroll = totalOriginalItems > itemsToShow; 
-            if (isScrolling || !canScroll) { 
-                console.log(`Scroll attempt blocked: isScrolling=${isScrolling}, canScroll=${canScroll}`);
-                return; 
+            const isMobile = mobileMediaQuery.matches;
+            if (isMobile) {
+                console.log("Scroll attempt blocked: Mobile device.");
+                return; // Ignore scroll attempts on mobile
             }
-            console.log("Scroll conditions met. Starting scroll..."); 
-            isScrolling = true; 
+
+            // Check scrollability based on calculation for desktop
+            const canScroll = totalOriginalItems > itemsToShow;
+            if (isScrolling || !canScroll) {
+                console.log(`Scroll attempt blocked: isScrolling=${isScrolling}, canScroll=${canScroll}`);
+                return;
+            }
+            console.log("Scroll conditions met. Starting scroll...");
+            isScrolling = true;
 
             const scrollAmount = testimonialWidth + gap;
-             clearTimeout(scrollEndTimer); 
+            clearTimeout(scrollEndTimer); // Clear any previous timer
             testimonialsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-             scrollEndTimer = setTimeout(handleScrollEnd, 500); 
+            // Set timeout ONLY for desktop to handle infinite loop reset
+            scrollEndTimer = setTimeout(handleScrollEnd, 500); // Adjust timeout duration if needed
         };
-        
-        // --- NEW Click Trigger on the WRAPPER ---
+
+        // Click Trigger on the WRAPPER (for desktop arrow)
         testimonialsWrapper.addEventListener('click', (event) => {
-             // Prevent clicks on buttons/links inside testimonials from triggering scroll
-             if (event.target.closest('.testimonial a, .testimonial button')) {
-                 console.log("Clicked on a link/button inside testimonial, ignoring scroll trigger.");
-                 return;
-             }
+            const isMobile = mobileMediaQuery.matches;
+            if (isMobile) {
+                console.log("Click ignored on wrapper: Mobile device.");
+                return; // Ignore clicks on mobile
+            }
 
-             // Check if the click is within the area of the ::after pseudo-element
-             const wrapperRect = testimonialsWrapper.getBoundingClientRect();
-             const arrowWidth = 35; // The width set in CSS for ::after
-             const paddingRight = parseFloat(window.getComputedStyle(testimonialsWrapper).paddingRight); // Get actual padding
-             
-             // Calculate the rough horizontal start position of the arrow
-             const arrowStartsAt = wrapperRect.right - paddingRight; // Arrow lives within padding
+            // Prevent clicks on buttons/links inside testimonials from triggering scroll
+            if (event.target.closest('.testimonial a, .testimonial button')) {
+                console.log("Clicked on a link/button inside testimonial, ignoring scroll trigger.");
+                return;
+            }
 
-             // Check if click is horizontally within the padding/arrow area
-             if (event.clientX >= arrowStartsAt && event.clientX <= wrapperRect.right) {
-                  console.log("Click detected in arrow region.");
-                  scrollNext();
-             }
+            // Check if the click is within the area of the ::after pseudo-element (arrow)
+            const wrapperRect = testimonialsWrapper.getBoundingClientRect();
+            // Use computed style to get arrow width dynamically if possible, fallback needed
+            const arrowComputedStyle = window.getComputedStyle(testimonialsWrapper, '::after');
+            const arrowWidth = parseFloat(arrowComputedStyle.width) || 35; // Fallback to 35px
+            const paddingRight = parseFloat(window.getComputedStyle(testimonialsWrapper).paddingRight);
+
+            // Calculate the rough horizontal start position of the arrow
+            // Arrow lives within padding, so check if click is to the right of content area start
+            const arrowStartsAt = wrapperRect.right - paddingRight; // Rough start
+
+            // Check if click is horizontally within the padding/arrow area on the right
+            if (event.clientX >= arrowStartsAt && event.clientX <= wrapperRect.right) {
+                 console.log("Click detected in arrow region.");
+                 scrollNext();
+            }
         });
 
-        // --- Resize Handling ---
+        // Manual scroll detection for infinite loop reset (Desktop only)
+        // This is needed if user scrolls manually instead of clicking arrow
+        let manualScrollTimer;
+        testimonialsContainer.addEventListener('scroll', () => {
+            const isMobile = mobileMediaQuery.matches;
+            if (isMobile || isScrolling) { // Don't interfere on mobile or during programmatic scroll
+                return;
+            }
+            // Debounce manual scroll check
+            clearTimeout(manualScrollTimer);
+            manualScrollTimer = setTimeout(handleScrollEnd, 150); // Short delay after manual scroll stops
+        });
+
+
+        // Resize Handling
         let resizeTimer;
         window.addEventListener('resize', () => {
             console.log("Window resize detected.");
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 console.log("Executing resize handler.");
-                setupCarousel(); // Recalculates dimensions, itemsToShow, and updates scrollability
+                // Re-run setup which now includes mobile/desktop check
+                setupCarousel();
             }, 250);
         });
 
-        // --- Initial Setup ---
-         setTimeout(setupCarousel, 100); 
+        // Listen for changes in the media query (e.g., orientation change)
+        mobileMediaQuery.addEventListener('change', () => {
+            console.log("Media query changed (e.g., orientation). Re-running setup.");
+            setupCarousel();
+        });
+
+        // Initial Setup
+        // Use setTimeout to ensure layout is likely stable
+        setTimeout(setupCarousel, 100);
 
     } else {
         console.log("No testimonials found in the container.");
-         // Ensure class is removed if no items initially
-         testimonialsWrapper.classList.remove('has-scroll-next');
+        // Ensure class is removed if no items initially
+        if (testimonialsWrapper) { // Check if wrapper exists before modifying
+            testimonialsWrapper.classList.remove('has-scroll-next');
+        }
     }
 
 }); // End DOMContentLoaded
