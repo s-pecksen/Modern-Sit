@@ -330,124 +330,189 @@ nav ul li a:hover::after {
 
 /* Testimonials Section */
 #testimonials {
-    padding: 80px 20px;
-    background-color: #f0f4f8;
-    text-align: center;
+    padding: 80px 0; /* Adjust padding if needed */
+    background-color: #f0f4f8; /* Existing */
+    text-align: center; /* Existing */
 }
 
 #testimonials h2 {
-    margin-bottom: 50px;
-    font-size: 2.2em;
-    color: #2A4365;
-    position: relative;
-    padding-bottom: 15px;
-    display: inline-block;
+    margin-bottom: 50px; /* Existing */
+    font-size: 2.2em; /* Existing */
+    color: #2A4365; /* Existing */
+    position: relative; /* Existing */
+    padding-bottom: 15px; /* Existing */
+    display: inline-block; /* Existing */
 }
 
 #testimonials h2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background-color: #FF9966;
+    content: ''; /* Existing */
+    position: absolute; /* Existing */
+    bottom: 0; /* Existing */
+    left: 50%; /* Existing */
+    transform: translateX(-50%); /* Existing */
+    width: 80px; /* Existing */
+    height: 3px; /* Existing */
+    background-color: #FF9966; /* Existing */
 }
 
+/* Wrapper hides the overflow */
+.testimonials-wrapper {
+    position: relative;
+    /* Calculate max-width based on 3 items + 2 gaps + some padding */
+    /* Example: (3 * 350px) + (2 * 30px) + (2 * 15px padding) = 1050 + 60 + 30 = 1140px */
+    max-width: 1140px; 
+    margin: 0 auto;
+    overflow: hidden; /* Crucial: Hides items outside the wrapper */
+    padding: 0 15px; /* Consistent padding */
+    box-sizing: border-box;
+}
+
+/* Container holds all cards (originals + duplicates) and scrolls */
 .testimonials-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
+    gap: 30px; /* Existing gap */
+    padding-bottom: 20px; /* Existing */
+    margin: 0; /* Existing */
+    /* NO scroll-behavior: smooth here - JS handles smooth scroll */
+    /* Allow scrolling, scrollbar will be hidden */
+    overflow-x: scroll; 
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    /* Prevent accidental vertical scrolling on touch */
+    overscroll-behavior-x: contain; 
+    /* Important: Remove width: fit-content. Let it expand. */
 }
 
-.testimonial {
-    flex: 1;
-    min-width: 300px;
-    max-width: 350px;
-    background-color: #ffffff;
-    border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.testimonial:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-}
-
-.testimonial-content {
-    padding: 30px;
-    text-align: left;
-}
-
-.testimonial-text {
-    font-size: 1.1em;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    color: #555;
-    position: relative;
-}
-
-.testimonial-text::before {
-    content: '"';
-    font-size: 4em;
-    color: #66CCCC;
-    opacity: 0.3;
-    position: absolute;
-    top: -20px;
-    left: -15px;
-    font-family: Georgia, serif;
-}
-
-.testimonial-full {
+/* Hide scrollbar for Chrome, Safari, and Opera */
+.testimonials-container::-webkit-scrollbar {
     display: none;
 }
 
+.testimonial {
+    flex: 0 0 350px; /* Fixed width is ESSENTIAL for calculations */
+    max-width: 350px; /* Reinforce fixed width */
+    background-color: #ffffff; /* Existing */
+    border-radius: 15px; /* Existing */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08); /* Existing */
+    overflow: hidden; /* Existing */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Keep hover effect */
+    position: relative; 
+    cursor: default; 
+    height: auto; 
+}
+
+.testimonial:hover {
+    transform: translateY(-10px); /* Existing */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* Existing */
+}
+
+.testimonial-content {
+    padding: 30px; /* Reset padding - no need to avoid arrow now */
+    text-align: left; /* Existing */
+    height: 100%; /* Existing */
+    display: flex; /* Existing */
+    flex-direction: column; /* Existing */
+    box-sizing: border-box; /* Existing */
+}
+
+.testimonial-text {
+    font-size: 1.1em; /* Existing */
+    line-height: 1.6; /* Existing */
+    margin-bottom: 20px; /* Existing */
+    color: #555; /* Existing */
+    position: relative; /* Existing */
+    flex-grow: 1; /* Allow text to take available space */
+}
+
+.testimonial-text::before {
+    content: '"'; /* Existing */
+    font-size: 4em; /* Existing */
+    color: #66CCCC; /* Existing */
+    opacity: 0.3; /* Existing */
+    position: absolute; /* Existing */
+    top: -20px; /* Existing */
+    left: -15px; /* Existing */
+    font-family: Georgia, serif; /* Existing */
+}
+
+.testimonial-full {
+    display: none; /* Existing */
+}
+
 .read-more-btn {
-    background-color: transparent;
-    color: #3C78D8;
-    border: none;
-    padding: 0;
-    font-size: 0.9em;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 15px;
-    transition: color 0.3s ease;
+    background-color: transparent; /* Existing */
+    color: #3C78D8; /* Existing */
+    border: none; /* Existing */
+    padding: 0; /* Existing */
+    font-size: 0.9em; /* Existing */
+    font-weight: 600; /* Existing */
+    cursor: pointer; /* Existing */
+    margin-bottom: 15px; /* Existing */
+    transition: color 0.3s ease; /* Existing */
+    align-self: flex-start; /* Align button to the start */
 }
 
 .read-more-btn:hover {
-    color: #FF9966;
-    text-decoration: underline;
+    color: #FF9966; /* Existing */
+    text-decoration: underline; /* Existing */
 }
 
 .testimonial-author {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex; /* Existing */
+    flex-direction: column; /* Existing */
+    align-items: flex-start; /* Existing */
+    margin-top: auto; /* Push author to the bottom */
 }
 
 .author-name {
-    font-weight: 700;
-    font-size: 1.1em;
-    margin: 0;
-    color: #2A4365;
+    font-weight: 700; /* Existing */
+    font-size: 1.1em; /* Existing */
+    margin: 0; /* Existing */
+    color: #2A4365; /* Existing */
 }
 
 .author-location {
-    font-size: 0.9em;
-    color: #777;
-    margin: 5px 0 0 0;
+    font-size: 0.9em; /* Existing */
+    color: #777; /* Existing */
+    margin: 5px 0 0 0; /* Existing */
 }
 
-@media (max-width: 768px) {
-    .testimonial {
-        max-width: 100%;
+/* --- Responsive Adjustments for Wrapper --- */
+@media (max-width: 1200px) { 
+    .testimonials-wrapper {
+        /* Fit 2 items + 1 gap + padding */
+        /* (2 * 350px) + 30px + (2 * 15px) = 700 + 30 + 30 = 760px */
+        max-width: 760px; 
     }
+}
+
+@media (max-width: 820px) { 
+     .testimonials-wrapper {
+        /* Fit 1 item + padding */
+        /* 350px + (2 * 15px) = 380px */
+        max-width: 380px; 
+    }
+     /* Optional: Center the single card visually if desired */
+     /* .testimonials-container { */
+     /*   padding-left: calc((100% - 350px) / 2); */
+     /*   padding-right: calc((100% - 350px) / 2); */
+     /* } */
+}
+
+@media (max-width: 480px) {
+    /* Adjustments for very small screens if needed */
+     .testimonials-wrapper {
+        max-width: 100%; 
+        padding: 0 10px; /* Reduce padding slightly */
+    }
+     .testimonial {
+         flex-basis: 300px; /* Maybe slightly smaller card */
+         max-width: 300px;
+    }
+    .testimonials-container {
+        gap: 15px; /* Reduce gap */
+    }
+     /* Recalculate wrapper widths if card size/gap changes */
 }
 
 #faq {
