@@ -179,7 +179,7 @@ nav ul li a:hover::after {
     right: 0;
     bottom: 0;
     background: url('images/paw-pattern.png');
-    opacity: 0.05;
+    opacity: 0.11;
     z-index: 0;
 }
 
@@ -358,29 +358,27 @@ nav ul li a:hover::after {
 /* Wrapper hides the overflow */
 .testimonials-wrapper {
     position: relative;
-    /* Calculate max-width based on 3 items + 2 gaps + some padding */
-    /* Example: (3 * 350px) + (2 * 30px) + (2 * 15px padding) = 1050 + 60 + 30 = 1140px */
+    /* Max-width calculation might need adjustment if padding changes significantly */
     max-width: 1140px; 
     margin: 0 auto;
-    overflow: hidden; /* Crucial: Hides items outside the wrapper */
-    padding: 0 15px; /* Consistent padding */
+    overflow: hidden; 
+    /* INCREASE right padding to make space for the button */
+    padding: 0 60px 0 15px; /* e.g., 60px on the right, 15px on left */
     box-sizing: border-box;
 }
 
-/* Container holds all cards (originals + duplicates) and scrolls */
+/* Container holds all cards (originals + duplicates) */
 .testimonials-container {
     display: flex;
-    gap: 30px; /* Existing gap */
-    padding-bottom: 20px; /* Existing */
-    margin: 0; /* Existing */
-    /* NO scroll-behavior: smooth here - JS handles smooth scroll */
-    /* Allow scrolling, scrollbar will be hidden */
-    overflow-x: scroll; 
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    /* Prevent accidental vertical scrolling on touch */
+    gap: 30px; 
+    padding-bottom: 20px; 
+    margin: 0; 
+    /* REMOVE overflow-x: scroll to disable manual scrolling */
+    /* overflow-x: scroll; */ 
+    -ms-overflow-style: none;  /* Hide scrollbar (IE/Edge) */
+    scrollbar-width: none;  /* Hide scrollbar (Firefox) */
+    /* Keep overscroll-behavior if you like the edge effect */
     overscroll-behavior-x: contain; 
-    /* Important: Remove width: fit-content. Let it expand. */
 }
 
 /* Hide scrollbar for Chrome, Safari, and Opera */
@@ -477,26 +475,70 @@ nav ul li a:hover::after {
     margin: 5px 0 0 0; /* Existing */
 }
 
+/* Arrow button styles */
+.testimonial-scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10; 
+    background-color: rgba(255, 153, 102, 0.8); 
+    color: white;
+    border: none;
+    border-radius: 50%; 
+    width: 45px; 
+    height: 45px;
+    font-size: 28px; 
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    line-height: 1; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
+
+.testimonial-scroll-arrow.right {
+    right: 10px; /* Position it within the new right padding */
+}
+
+.testimonial-scroll-arrow:hover {
+    background-color: rgba(255, 128, 64, 0.9); /* Darker on hover */
+    transform: translateY(-50%) scale(1.05); /* Slight grow effect */
+}
+
+/* Style for when button should be disabled (e.g., not enough items) */
+.testimonial-scroll-arrow:disabled { 
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none; /* Prevent clicks */
+}
+
 /* --- Responsive Adjustments for Wrapper --- */
+/* Adjust max-width and padding in media queries if necessary */
 @media (max-width: 1200px) { 
     .testimonials-wrapper {
-        /* Fit 2 items + 1 gap + padding */
-        /* (2 * 350px) + 30px + (2 * 15px) = 700 + 30 + 30 = 760px */
-        max-width: 760px; 
+        /* Recalculate max-width based on 2 items + 1 gap + L/R padding */
+        /* (2 * 350px) + 30px + 15px + 60px = 700 + 30 + 75 = 805px */
+        max-width: 805px; 
+        padding: 0 50px 0 15px; /* Adjust padding if needed */
+    }
+    .testimonial-scroll-arrow.right {
+        right: 5px; /* Adjust position slightly */
     }
 }
 
 @media (max-width: 820px) { 
      .testimonials-wrapper {
-        /* Fit 1 item + padding */
-        /* 350px + (2 * 15px) = 380px */
-        max-width: 380px; 
+        /* Recalculate max-width based on 1 item + L/R padding */
+        /* 350px + 15px + 60px = 425px */
+        max-width: 425px; 
+        padding: 0 45px 0 15px; /* Adjust padding */
     }
-     /* Optional: Center the single card visually if desired */
-     /* .testimonials-container { */
-     /*   padding-left: calc((100% - 350px) / 2); */
-     /*   padding-right: calc((100% - 350px) / 2); */
-     /* } */
+     .testimonial-scroll-arrow.right {
+        right: 5px; /* Adjust position slightly */
+    }
+     /* Optional centering for single card might need adjustment */
 }
 
 @media (max-width: 480px) {
