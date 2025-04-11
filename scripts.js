@@ -26,20 +26,75 @@ document.addEventListener('DOMContentLoaded', () => {
     // Testimonial "Read More" functionality
     const readMoreBtns = document.querySelectorAll('.read-more-btn');
     readMoreBtns.forEach(btn => {
-        const testimonialText = btn.previousElementSibling;
-        const previewSpan = testimonialText.querySelector('.testimonial-preview');
-        const fullSpan = testimonialText.querySelector('.testimonial-full');
+        // Find the new paragraph elements within the same content container
+        const contentContainer = btn.closest('.testimonial-content');
+        if (!contentContainer) return; // Skip if structure is wrong
 
-        if (previewSpan && fullSpan && fullSpan.textContent.trim().length > 0) {
-            btn.style.display = 'inline-block'; // Show button only if there's full text
-            btn.addEventListener('click', () => {
-                const isExpanded = fullSpan.style.display === 'inline';
-                fullSpan.style.display = isExpanded ? 'none' : 'inline';
-                previewSpan.style.display = isExpanded ? 'inline' : 'inline'; // Keep preview visible
-                btn.textContent = isExpanded ? 'Read more' : 'Read less';
-            });
+        const previewP = contentContainer.querySelector('.testimonial-preview');
+        const fullP = contentContainer.querySelector('.testimonial-full');
+
+        // Use the old span check ONLY for testimonials not yet restructured
+        // TODO: Remove this block once all testimonials are restructured
+        const oldTestimonialText = btn.previousElementSibling;
+        const oldPreviewSpan = oldTestimonialText?.classList.contains('testimonial-text') ? oldTestimonialText.querySelector('.testimonial-preview') : null;
+        const oldFullSpan = oldTestimonialText?.classList.contains('testimonial-text') ? oldTestimonialText.querySelector('.testimonial-full') : null;
+
+        if (previewP && fullP) {
+            // --- Logic for new structure ---
+            if (fullP.textContent.trim().length > 0) {
+                // Initial state: Show preview, hide full
+                previewP.style.display = 'block';
+                fullP.style.display = 'none';
+                btn.style.display = 'inline-block'; // Show button
+
+                btn.addEventListener('click', () => {
+                    const isExpanded = fullP.style.display === 'block';
+
+                    if (isExpanded) {
+                        // Collapse: Show preview, hide full
+                        fullP.style.display = 'none';
+                        previewP.style.display = 'block';
+                        btn.textContent = 'Read more';
+                    } else {
+                        // Expand: Hide preview, show full
+                        previewP.style.display = 'none';
+                        fullP.style.display = 'block';
+                        btn.textContent = 'Read less';
+                    }
+                });
+            } else {
+                // Hide button if no full text
+                if (previewP) previewP.style.display = 'block';
+                btn.style.display = 'none';
+            }
+        } else if (oldPreviewSpan && oldFullSpan) {
+             // --- Fallback logic for old structure (spans within p.testimonial-text) ---
+             console.warn("Using fallback JS for testimonial:", btn.closest('.testimonial'));
+             if (oldFullSpan.textContent.trim().length > 0) {
+                 oldPreviewSpan.style.display = 'block'; // Default to block
+                 oldFullSpan.style.display = 'none';
+                 btn.style.display = 'inline-block';
+
+                 btn.addEventListener('click', () => {
+                     const isExpanded = oldFullSpan.style.display !== 'none';
+                     if (isExpanded) {
+                         oldFullSpan.style.display = 'none';
+                         oldPreviewSpan.style.display = 'block';
+                         btn.textContent = 'Read more';
+                     } else {
+                         oldPreviewSpan.style.display = 'none';
+                         oldFullSpan.style.display = 'block'; // Use block for full text
+                         btn.textContent = 'Read less';
+                     }
+                 });
+             } else {
+                 if (oldPreviewSpan) oldPreviewSpan.style.display = 'block';
+                 btn.style.display = 'none';
+             }
         } else {
-            btn.style.display = 'none'; // Hide button if no full text
+             // Hide button if elements are missing entirely
+             console.error("Could not find testimonial text elements for button:", btn);
+            btn.style.display = 'none';
         }
     });
 
@@ -254,16 +309,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Manual scroll detection for infinite loop reset (Desktop only)
-        // This is needed if user scrolls manually instead of clicking arrow
+        // Manual scroll detection for infinite loop reset
+        // This listener's core logic should only run on mobile now
         let manualScrollTimer;
         testimonialsContainer.addEventListener('scroll', () => {
             const isMobile = mobileMediaQuery.matches;
-            if (isMobile || isScrolling) { // Don't interfere on mobile or during programmatic scroll
+            // Only run debounce for manual scrolls on mobile
+            // Ignore if on desktop OR if a programmatic scroll is happening
+            if (!isMobile || isScrolling) {
+                // Optional: console log for debugging if needed
+                // console.log(`Manual scroll listener ignored: isMobile=${isMobile}, isScrolling=${isScrolling}`);
                 return;
             }
-            // Debounce manual scroll check
+            // Debounce manual scroll check (Mobile Only)
             clearTimeout(manualScrollTimer);
+            // console.log("Manual scroll detected (Mobile). Setting timer for handleScrollEnd."); // Optional log
             manualScrollTimer = setTimeout(handleScrollEnd, 150); // Short delay after manual scroll stops
         });
 

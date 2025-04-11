@@ -358,11 +358,11 @@ nav ul li a:hover::after {
 /* Wrapper hides the overflow and positions the arrow */
 .testimonials-wrapper {
     position: relative; /* Needed for absolute positioning of ::after */
-    max-width: 1140px; 
+    max-width: 1200px; /* Increased max-width */
     margin: 0 auto;
-    overflow: hidden; 
+    overflow: hidden;
     /* Add padding on the right to ensure content doesn't go under the arrow */
-    padding: 0 60px 0 15px; /* Increased right padding */
+    padding: 0 60px 0 15px; /* Keep right padding for arrow */
     box-sizing: border-box;
 }
 
@@ -385,14 +385,16 @@ nav ul li a:hover::after {
 .testimonial {
     flex: 0 0 350px; /* Fixed width is ESSENTIAL for calculations */
     max-width: 350px; /* Reinforce fixed width */
-    background-color: #ffffff; /* Existing */
-    border-radius: 15px; /* Existing */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08); /* Existing */
-    overflow: hidden; /* Existing */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Keep hover effect */
-    position: relative; 
-    cursor: default; 
-    height: auto; 
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 30px; /* Adjust padding as needed */
+    width: 350px; /* Keep this or adjust based on design */
+    flex-shrink: 0;
+    scroll-snap-align: start; /* Optional: Helps with snapping on mobile */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    box-sizing: border-box; /* Add this */
 }
 
 .testimonial:hover {
@@ -401,36 +403,38 @@ nav ul li a:hover::after {
 }
 
 .testimonial-content {
-    padding: 30px; /* Reset padding - no need to avoid arrow now */
-    text-align: left; /* Existing */
-    height: 100%; /* Existing */
-    display: flex; /* Existing */
-    flex-direction: column; /* Existing */
-    box-sizing: border-box; /* Existing */
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure content takes full height */
+    position: relative; /* Needed for absolute positioning of pseudo-element */
+    padding-left: 20px; /* Add padding to make space for quote */
+    text-align: left; /* Add this to align text left */
 }
 
-.testimonial-text {
-    font-size: 1.1em; /* Existing */
-    line-height: 1.6; /* Existing */
-    margin-bottom: 20px; /* Existing */
-    color: #555; /* Existing */
-    position: relative; /* Existing */
-    flex-grow: 1; /* Allow text to take available space */
+.testimonial-content::before {
+    content: '"'; /* Use single quotes for the CSS string */
+    font-size: 4em;
+    color: #66CCCC;
+    opacity: 0.3;
+    position: absolute;
+    top: -10px; /* Adjust position */
+    left: -5px; /* Adjust position */
+    font-family: Georgia, serif;
+    line-height: 1; /* Prevent extra space */
+    z-index: 0; /* Ensure it's behind text */
 }
 
-.testimonial-text::before {
-    content: '"'; /* Existing */
-    font-size: 4em; /* Existing */
-    color: #66CCCC; /* Existing */
-    opacity: 0.3; /* Existing */
-    position: absolute; /* Existing */
-    top: -20px; /* Existing */
-    left: -15px; /* Existing */
-    font-family: Georgia, serif; /* Existing */
-}
-
+/* Style the new paragraph elements if needed (they might inherit fine) */
+.testimonial-preview,
 .testimonial-full {
-    display: none; /* Existing */
+    font-size: 1.1em; /* Example: Inherit or set specific size */
+    line-height: 1.6; /* Example: Inherit or set specific line height */
+    margin-bottom: 20px; /* Example: Set spacing */
+    color: #555; /* Example: Set color */
+    flex-grow: 1; /* Allow text paragraphs to take space */
+    /* Ensure text is above pseudo-element */
+    position: relative;
+    z-index: 1;
 }
 
 .read-more-btn {
@@ -473,44 +477,39 @@ nav ul li a:hover::after {
 
 /* NEW: Arrow Button styled on the WRAPPER */
 .testimonials-wrapper::after {
-    content: '›'; /* Arrow character */
+    content: '>'; /* Change back to simple arrow character */
     position: absolute;
     top: 50%;
-    /* Position inside the right padding */
-    right: 10px; 
+    right: 15px; /* Adjust as needed */
     transform: translateY(-50%);
-    z-index: 10; 
-    background-color: rgba(255, 153, 102, 0.8); 
+    width: 35px;
+    height: 35px;
+    background-color: #FF9966; /* Arrow background */
     color: white;
-    border: none;
-    /* Style to look like a tab/button */
-    border-radius: 8px; /* Adjust as desired */
-    width: 35px; 
-    height: 60px; 
-    font-size: 30px; 
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, opacity 0.3s ease;
-    display: flex; 
-    align-items: center;
+    border-radius: 50%;
+    display: flex;
     justify-content: center;
-    line-height: 1; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    
-    /* Initially hidden - JS will show it via a class */
-    opacity: 0;
-    pointer-events: none; 
+    align-items: center;
+    font-size: 18px; /* Adjusted size for '>' */
+    font-weight: bold;
+    line-height: 1; /* Ensure vertical centering */
+    cursor: pointer;
+    z-index: 5;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+    pointer-events: none; /* Initially not clickable */
 }
 
 /* NEW: Class added by JS to show the arrow */
 .testimonials-wrapper.has-scroll-next::after {
     opacity: 1;
-    pointer-events: auto; /* Make clickable */
+    pointer-events: auto;
 }
 
 /* Optional: Hover state for the wrapper's arrow */
 .testimonials-wrapper.has-scroll-next:hover::after {
-     background-color: rgba(255, 128, 64, 0.9); 
+    background-color: #FF8040; /* Darken on hover */
+    transform: translateY(-50%) scale(1.1); /* Slight scale effect */
 }
 
 /* --- Responsive Adjustments for Wrapper --- */
@@ -810,4 +809,35 @@ footer p {
     background-color: #3C78D8;
     border-radius: 3px;
     transition: all 0.3s ease;
+}
+
+/* Add this media query */
+@media (min-width: 769px) {
+    .testimonials-wrapper {
+        overflow-x: hidden; /* Prevent manual horizontal scroll on wrapper */
+        /* Keep existing padding if needed */
+    }
+    .testimonials-container {
+         overflow-x: hidden; /* Also prevent scroll on the container itself */
+    }
+
+    /* Ensure arrow is only visible when needed */
+     .testimonials-wrapper.has-scroll-next::after {
+         opacity: 1;
+         pointer-events: auto;
+     }
+
+     .testimonials-wrapper.has-scroll-next:hover::after {
+         background-color: #FF8040; /* Darken on hover */
+         transform: translateY(-50%) scale(1.1); /* Slight scale effect */
+     }
+}
+
+/* Optional: Adjustments for smaller screens if needed */
+@media (max-width: 1200px) { 
+    .testimonials-wrapper {
+        max-width: 805px; 
+        padding: 0 50px 0 15px; 
+    }
+    .testimonials-wrapper::after { right: 5px; /* Adjust position */ }
 }
