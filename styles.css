@@ -357,14 +357,44 @@ nav ul li a:hover::after {
 
 /* Wrapper hides the overflow and positions the arrow */
 .testimonials-wrapper {
-    position: relative; /* Needed for absolute positioning of ::after */
-    max-width: 1200px; /* Increased max-width */
+    position: relative; 
+    max-width: 1200px; 
     margin: 0 auto;
     overflow: hidden;
-    /* Add padding on the right to ensure content doesn't go under the arrow */
-    padding: 0 60px 0 15px; /* Keep right padding for arrow */
+    padding: 0 60px; /* Symmetrical padding for left and right arrows */
     box-sizing: border-box;
 }
+
+/* === ADD THESE STYLES FOR THE LEFT ARROW === */
+.testimonials-wrapper::before {
+    content: '❮';
+    position: absolute;
+    top: 50%;
+    left: 10px;  /* We might adjust this if padding alone isn't enough */
+    transform: translateY(-50%);
+    font-size: 2.5rem;
+    color: #3C78D8; /* Blue */
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    padding: 10px 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.testimonials-wrapper.has-scroll-prev::before { /* Shows LEFT arrow when class is present */
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.testimonials-wrapper.has-scroll-prev:hover::before { /* Slight visual change on hover for left arrow */
+    color: #2A4365; /* Darker Blue */
+    background-color: rgba(255, 255, 255, 1); /* Opaque white background */
+}
+/* === END OF STYLES FOR THE LEFT ARROW === */
 
 /* Container holds all cards and scrolls */
 .testimonials-container {
@@ -477,39 +507,32 @@ nav ul li a:hover::after {
 
 /* NEW: Arrow Button styled on the WRAPPER */
 .testimonials-wrapper::after {
-    content: '>'; /* Change back to simple arrow character */
+    content: '❯'; 
     position: absolute;
     top: 50%;
-    right: 15px; /* Adjust as needed */
+    right: 10px;
     transform: translateY(-50%);
-    width: 35px;
-    height: 35px;
-    background-color: #FF9966; /* Arrow background */
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px; /* Adjusted size for '>' */
-    font-weight: bold;
-    line-height: 1; /* Ensure vertical centering */
+    font-size: 2.5rem;
+    color: #3C78D8; 
     cursor: pointer;
-    z-index: 5;
-    opacity: 0; /* Hidden by default */
-    transition: opacity 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
-    pointer-events: none; /* Initially not clickable */
+    z-index: 10;
+    transition: all 0.3s ease; /* THIS IS PRESENT */
+    opacity: 0; 
+    pointer-events: none; 
+    padding: 10px 5px;
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* NEW: Class added by JS to show the arrow */
 .testimonials-wrapper.has-scroll-next::after {
     opacity: 1;
     pointer-events: auto;
 }
 
-/* Optional: Hover state for the wrapper's arrow */
 .testimonials-wrapper.has-scroll-next:hover::after {
-    background-color: #FF8040; /* Darken on hover */
-    transform: translateY(-50%) scale(1.1); /* Slight scale effect */
+    color: #2A4365; /* Darker Blue */
+    background-color: rgba(255, 255, 255, 1); /* Opaque white background */
 }
 
 /* --- Responsive Adjustments for Wrapper --- */
@@ -826,10 +849,17 @@ footer p {
          opacity: 1;
          pointer-events: auto;
      }
+     .testimonials-wrapper.has-scroll-prev::before {
+        opacity: 1;
+        pointer-events: auto;
+    }
 
-     .testimonials-wrapper.has-scroll-next:hover::after {
-         background-color: #FF8040; /* Darken on hover */
+     /* MODIFIED HOVER STYLES FOR BOTH ARROWS */
+     .testimonials-wrapper.has-scroll-next:hover::after,
+     .testimonials-wrapper.has-scroll-prev:hover::before {
+         background-color: #FF8040; /* Darken on hover - Orange */
          transform: translateY(-50%) scale(1.1); /* Slight scale effect */
+         color: #FFFFFF; /* Optional: Change arrow character to white for better contrast on orange */
      }
 }
 

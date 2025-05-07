@@ -23,79 +23,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Testimonial "Read More" functionality
-    const readMoreBtns = document.querySelectorAll('.read-more-btn');
-    readMoreBtns.forEach(btn => {
-        // Find the new paragraph elements within the same content container
-        const contentContainer = btn.closest('.testimonial-content');
-        if (!contentContainer) return; // Skip if structure is wrong
+    // Reusable function to initialize "Read More" for a single testimonial element
+    const initializeReadMoreForTestimonial = (testimonialEl) => {
+        const btn = testimonialEl.querySelector('.read-more-btn');
+        const contentContainer = testimonialEl.querySelector('.testimonial-content');
+
+        if (!btn || !contentContainer) {
+            // console.warn("Read more button or content container not found in testimonial:", testimonialEl);
+            return;
+        }
 
         const previewP = contentContainer.querySelector('.testimonial-preview');
         const fullP = contentContainer.querySelector('.testimonial-full');
 
-        // Use the old span check ONLY for testimonials not yet restructured
-        // TODO: Remove this block once all testimonials are restructured
-        const oldTestimonialText = btn.previousElementSibling;
-        const oldPreviewSpan = oldTestimonialText?.classList.contains('testimonial-text') ? oldTestimonialText.querySelector('.testimonial-preview') : null;
-        const oldFullSpan = oldTestimonialText?.classList.contains('testimonial-text') ? oldTestimonialText.querySelector('.testimonial-full') : null;
-
         if (previewP && fullP) {
-            // --- Logic for new structure ---
             if (fullP.textContent.trim().length > 0) {
-                // Initial state: Show preview, hide full
+                // Initial state: Show preview, hide full text
                 previewP.style.display = 'block';
                 fullP.style.display = 'none';
-                btn.style.display = 'inline-block'; // Show button
+                btn.textContent = 'Read more'; // Ensure button text is reset
+                btn.style.display = 'inline-block';
 
-                btn.addEventListener('click', () => {
-                    const isExpanded = fullP.style.display === 'block';
+                // Remove any old listener before adding a new one (important for re-initialization)
+                // A simple way for this specific case is to replace the button with its clone to remove listeners.
+                // However, since we are calling this on newly created clones or on initial setup, 
+                // we might not need to worry about old listeners IF this function is called correctly.
+                // For safety, let's ensure a fresh listener or handle re-binding carefully.
+                // A more robust way if elements are not replaced: btn.replaceWith(btn.cloneNode(true)); then re-select btn.
+                // For this case, we'll rely on it being called on fresh clones or once initially.
+                // If issues persist, explicit listener removal/re-cloning the button itself might be needed.
 
-                    if (isExpanded) {
-                        // Collapse: Show preview, hide full
-                        fullP.style.display = 'none';
-                        previewP.style.display = 'block';
-                        btn.textContent = 'Read more';
-                    } else {
-                        // Expand: Hide preview, show full
-                        previewP.style.display = 'none';
-                        fullP.style.display = 'block';
-                        btn.textContent = 'Read less';
-                    }
-                });
+                // Check if a listener already exists to avoid duplicates if not careful
+                if (!btn.hasReadMoreListener) { // Add a custom property to track
+                    btn.addEventListener('click', () => {
+                        const isExpanded = fullP.style.display === 'block';
+                        if (isExpanded) {
+                            fullP.style.display = 'none';
+                            previewP.style.display = 'block';
+                            btn.textContent = 'Read more';
+                        } else {
+                            previewP.style.display = 'none';
+                            fullP.style.display = 'block';
+                            btn.textContent = 'Read less';
+                        }
+                    });
+                    btn.hasReadMoreListener = true; // Mark that listener is attached
+                }
             } else {
-                // Hide button if no full text
                 if (previewP) previewP.style.display = 'block';
+                fullP.style.display = 'none'; // Ensure full is hidden if empty
                 btn.style.display = 'none';
             }
-        } else if (oldPreviewSpan && oldFullSpan) {
-             // --- Fallback logic for old structure (spans within p.testimonial-text) ---
-             console.warn("Using fallback JS for testimonial:", btn.closest('.testimonial'));
-             if (oldFullSpan.textContent.trim().length > 0) {
-                 oldPreviewSpan.style.display = 'block'; // Default to block
-                 oldFullSpan.style.display = 'none';
-                 btn.style.display = 'inline-block';
-
-                 btn.addEventListener('click', () => {
-                     const isExpanded = oldFullSpan.style.display !== 'none';
-                     if (isExpanded) {
-                         oldFullSpan.style.display = 'none';
-                         oldPreviewSpan.style.display = 'block';
-                         btn.textContent = 'Read more';
-                     } else {
-                         oldPreviewSpan.style.display = 'none';
-                         oldFullSpan.style.display = 'block'; // Use block for full text
-                         btn.textContent = 'Read less';
-                     }
-                 });
-             } else {
-                 if (oldPreviewSpan) oldPreviewSpan.style.display = 'block';
-                 btn.style.display = 'none';
-             }
         } else {
-             // Hide button if elements are missing entirely
-             console.error("Could not find testimonial text elements for button:", btn);
+            // console.error("Could not find testimonial preview/full text elements for button:", btn);
             btn.style.display = 'none';
         }
+    };
+
+    // Testimonial "Read More" functionality (Initial Setup)
+    const allTestimonials = document.querySelectorAll('.testimonial');
+    allTestimonials.forEach(testimonial => {
+        initializeReadMoreForTestimonial(testimonial);
     });
 
     // FAQ Accordion
@@ -145,29 +133,49 @@ document.addEventListener('DOMContentLoaded', () => {
     if (originalTestimonials.length > 0) {
 
         let itemsToShow = 3;
-        let testimonialWidth = 350;
-        let gap = 30;
+        let testimonialWidth = 350; // Default, will be calculated
+        let gap = 30; // Default, will be calculated
         let totalOriginalItems = originalTestimonials.length;
         let isScrolling = false;
         let clones = [];
-        let scrollEndTimer = null;
+        let scrollEndTimer = null; // Timer for programmatic scroll end
+        let manualScrollDebounceTimer = null; // Timer for manual scroll event
 
         // Function to update wrapper class based on scrollability and device type
         const updateScrollability = () => {
             const isMobile = mobileMediaQuery.matches;
-            const canScrollDesktop = totalOriginalItems > itemsToShow;
+
+            // Always clear previous states first
+            testimonialsWrapper.classList.remove('has-scroll-prev', 'has-scroll-next');
 
             if (isMobile) {
-                testimonialsWrapper.classList.remove('has-scroll-next');
-                console.log("Scrollability update (Mobile): Hiding arrow.");
+                // console.log("Scrollability update (Mobile): Arrows hidden by default.");
+                // On mobile, arrows are typically hidden by CSS or not used.
+                return;
+            }
+
+            // Desktop arrow logic:
+            const scrollLeft = testimonialsContainer.scrollLeft;
+            const scrollWidth = testimonialsContainer.scrollWidth;
+            const clientWidth = testimonialsContainer.clientWidth;
+
+            // Show PREV arrow if not at the very beginning
+            if (scrollLeft > 1) { // Use 1px as a small buffer for precision
+                testimonialsWrapper.classList.add('has-scroll-prev');
+                // console.log("Scrollability update (Desktop): Showing PREV arrow.");
             } else {
-                if (canScrollDesktop) {
-                    testimonialsWrapper.classList.add('has-scroll-next');
-                    console.log("Scrollability update (Desktop): Showing arrow.");
-                } else {
-                    testimonialsWrapper.classList.remove('has-scroll-next');
-                    console.log("Scrollability update (Desktop): Hiding arrow (not enough items).");
-                }
+                // console.log("Scrollability update (Desktop): Hiding PREV arrow.");
+            }
+
+            // Show NEXT arrow if there's content to scroll towards on the right
+            // This considers the actual scrollable width vs the visible width.
+            // For infinite scroll, totalOriginalItems > itemsToShow is also a good check
+            // as cloning ensures there's usually something "next".
+            if (scrollLeft < (scrollWidth - clientWidth - 1) && totalOriginalItems > itemsToShow) {
+                testimonialsWrapper.classList.add('has-scroll-next');
+                // console.log("Scrollability update (Desktop): Showing NEXT arrow.");
+            } else {
+                // console.log("Scrollability update (Desktop): Hiding NEXT arrow (at end or not enough items).");
             }
         };
 
@@ -175,158 +183,215 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Setting up carousel...");
             isScrolling = false;
             clearTimeout(scrollEndTimer);
-            clones.forEach(clone => clone.remove()); // Remove previous clones
-            clones = []; // Reset clones array
-            // Ensure we only select non-cloned items for recalculation
+            clearTimeout(manualScrollDebounceTimer); 
+            clones.forEach(clone => clone.remove());
+            clones = [];
             originalTestimonials = Array.from(testimonialsContainer.querySelectorAll('.testimonial:not(.clone)'));
             totalOriginalItems = originalTestimonials.length;
             console.log(`Found ${totalOriginalItems} original testimonials.`);
 
+            // Re-initialize read more for original testimonials in case they were somehow affected
+            // or if setupCarousel is ever called in a way that might require this.
+            originalTestimonials.forEach(testimonial => {
+                initializeReadMoreForTestimonial(testimonial);
+            });
+
             if (totalOriginalItems === 0) {
                  console.log("No original testimonials found to setup.");
-                 updateScrollability(); // Ensure class is removed if no items
+                 updateScrollability(); 
                  return;
-             }
+            }
 
             const containerStyle = window.getComputedStyle(testimonialsContainer);
             gap = parseFloat(containerStyle.gap) || 30;
 
-            requestAnimationFrame(() => { // Use requestAnimationFrame to wait for layout
-                if (originalTestimonials.length > 0) {
+            requestAnimationFrame(() => {
+                if (originalTestimonials.length > 0 && originalTestimonials[0]) {
                     testimonialWidth = originalTestimonials[0].offsetWidth;
-                    console.log(`Calculated testimonialWidth: ${testimonialWidth}px, gap: ${gap}px`);
+                    // console.log(`Calculated testimonialWidth: ${testimonialWidth}px, gap: ${gap}px`);
                 } else {
                     testimonialWidth = 350; // Fallback
+                    // console.log(`Using fallback testimonialWidth: ${testimonialWidth}px, gap: ${gap}px`);
                 }
 
                 const wrapperWidth = testimonialsWrapper.clientWidth;
                 itemsToShow = Math.max(1, Math.floor((wrapperWidth + gap) / (testimonialWidth + gap)));
-                console.log(`Wrapper width: ${wrapperWidth}px, Items to show: ${itemsToShow}`);
+                // console.log(`Wrapper width: ${wrapperWidth}px, Items to show: ${itemsToShow}`);
 
                 const isMobile = mobileMediaQuery.matches;
-                console.log(`Is mobile? ${isMobile}`);
 
-                // Cloning logic only for desktop when needed
                 if (!isMobile && totalOriginalItems > itemsToShow) {
-                    console.log(`Cloning first ${itemsToShow} items for infinite loop (Desktop).`);
-                    for (let i = 0; i < itemsToShow; i++) {
-                        if (i < totalOriginalItems) {
-                            const clone = originalTestimonials[i].cloneNode(true);
-                            clone.classList.add('clone');
-                            clone.setAttribute('aria-hidden', 'true');
-                            testimonialsContainer.appendChild(clone);
-                            clones.push(clone);
+                    // console.log(`Cloning first ${itemsToShow} items for infinite loop (Desktop).`);
+                    for (let i = 0; i < itemsToShow && i < totalOriginalItems; i++) {
+                        const clone = originalTestimonials[i].cloneNode(true);
+                        clone.classList.add('clone');
+                        clone.setAttribute('aria-hidden', 'true');
+                        // CRITICAL: Remove the 'hasReadMoreListener' flag from the clone before re-initializing
+                        // so that the initializeReadMoreForTestimonial function adds a new listener.
+                        const clonedBtn = clone.querySelector('.read-more-btn');
+                        if (clonedBtn) {
+                            delete clonedBtn.hasReadMoreListener; 
                         }
+                        testimonialsContainer.appendChild(clone);
+                        clones.push(clone);
+                        initializeReadMoreForTestimonial(clone); // Initialize for the new clone
                     }
                 } else if (isMobile) {
-                    console.log("Not cloning items (Mobile).");
+                    // console.log("Not cloning items (Mobile).");
                 } else {
-                    console.log("Not cloning items - all items fit or not enough items (Desktop).");
+                    // console.log("Not cloning items - all items fit or not enough items (Desktop).");
                 }
 
-                testimonialsContainer.scrollLeft = 0; // Reset scroll position
-                updateScrollability(); // Add/remove class based on calculation and device
-                console.log("Carousel setup complete.");
+                testimonialsContainer.scrollLeft = 0;
+                updateScrollability(); 
+                // console.log("Carousel setup complete.");
             });
         };
 
-        const handleScrollEnd = () => {
+        const handleScrollEnd = (isProgrammaticScroll = true) => {
             const isMobile = mobileMediaQuery.matches;
-            if (isMobile) {
-                isScrolling = false; // Still reset flag in case it was somehow set
-                console.log("Scroll end ignored (Mobile). isScrolling reset.");
-                return; // Don't perform infinite loop reset on mobile
+            if (isMobile && isProgrammaticScroll) { // Only act if it's a programmatic scroll on mobile we need to stop
+                isScrolling = false;
+                // console.log("Programmatic scroll end ignored (Mobile). isScrolling reset.");
+                updateScrollability(); // Still update arrows
+                return;
             }
+            
+            // Desktop-only infinite scroll reset logic (when scrolling forward)
+            if (!isMobile) {
+                const scrollAmountOneItem = testimonialWidth + gap;
+                const loopResetTargetScrollLeft = totalOriginalItems * scrollAmountOneItem;
+                // console.log(`Scroll check: scrollLeft=${testimonialsContainer.scrollLeft}, targetThreshold=${loopResetTargetScrollLeft}`);
 
-            // Desktop-only infinite scroll reset logic
-            const scrollAmountOneItem = testimonialWidth + gap;
-            const loopResetTargetScrollLeft = totalOriginalItems * scrollAmountOneItem;
-            console.log(`Scroll check: scrollLeft=${testimonialsContainer.scrollLeft}, targetThreshold=${loopResetTargetScrollLeft}`);
-
-            if (testimonialsContainer.scrollLeft >= loopResetTargetScrollLeft - 10) { // Use a small buffer
-                console.log("Loop forward threshold reached. Resetting scroll to beginning.");
-                // Use 'auto' for instant jump, 'smooth' causes issues here
-                testimonialsContainer.scrollTo({ left: 0, behavior: 'auto' });
+                if (testimonialsContainer.scrollLeft >= loopResetTargetScrollLeft - (testimonialWidth / 2) ) { // Adjusted threshold
+                    // console.log("Loop forward threshold reached. Resetting scroll to beginning.");
+                    testimonialsContainer.scrollTo({ left: 0, behavior: 'auto' });
+                }
             }
-            isScrolling = false;
-            // No need to call updateScrollability here unless items change dynamically
-            console.log("isScrolling reset to false.");
+            
+            if (isProgrammaticScroll) { // Only reset isScrolling if it was a programmatic scroll ending
+                isScrolling = false;
+            }
+            updateScrollability(); // Update arrows after scroll, regardless of type
+            // console.log(`handleScrollEnd: isScrolling=${isScrolling}. Arrows updated.`);
         };
 
+        const scrollPrev = () => {
+            const isMobile = mobileMediaQuery.matches;
+            if (isMobile || isScrolling) {
+                // console.log(`Scroll PREV attempt blocked: isMobile=${isMobile}, isScrolling=${isScrolling}`);
+                return;
+            }
+
+            if (testimonialsContainer.scrollLeft === 0 && totalOriginalItems > itemsToShow) {
+                // If at the beginning and infinite scroll is active, jump to the "end" (before clones)
+                // This makes the loop bi-directional.
+                // console.log("Scroll PREV: At beginning with infinite scroll. Jumping to end.");
+                isScrolling = true;
+                const scrollAmountOneItem = testimonialWidth + gap;
+                const effectiveEndScrollLeft = (totalOriginalItems * scrollAmountOneItem) - scrollAmountOneItem;
+                testimonialsContainer.scrollTo({left: effectiveEndScrollLeft, behavior: 'auto'});
+                // Then smoothly scroll to the item that is now "previous"
+                // This needs to happen in a requestAnimationFrame to ensure the auto scroll has taken effect
+                requestAnimationFrame(() => {
+                    testimonialsContainer.scrollBy({ left: -scrollAmountOneItem, behavior: 'smooth' });
+                    scrollEndTimer = setTimeout(() => handleScrollEnd(true), 500);
+                });
+                return;
+            } else if (testimonialsContainer.scrollLeft === 0) {
+                // console.log("Scroll PREV: Already at the beginning, no infinite jump.");
+                updateScrollability(); // Ensure arrow state is correct
+                return;
+            }
+
+
+            isScrolling = true;
+            // console.log("Scroll PREV conditions met. Starting scroll PREV...");
+
+            const scrollAmount = testimonialWidth + gap;
+            clearTimeout(scrollEndTimer);
+
+            testimonialsContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            scrollEndTimer = setTimeout(() => handleScrollEnd(true), 500);
+        };
 
         const scrollNext = () => {
             const isMobile = mobileMediaQuery.matches;
             if (isMobile) {
-                console.log("Scroll attempt blocked: Mobile device.");
-                return; // Ignore scroll attempts on mobile
-            }
-
-            // Check scrollability based on calculation for desktop
-            const canScroll = totalOriginalItems > itemsToShow;
-            if (isScrolling || !canScroll) {
-                console.log(`Scroll attempt blocked: isScrolling=${isScrolling}, canScroll=${canScroll}`);
+                // console.log("Scroll NEXT attempt blocked: Mobile device.");
                 return;
             }
-            console.log("Scroll conditions met. Starting scroll...");
+
+            const canScroll = totalOriginalItems > itemsToShow;
+            if (isScrolling || !canScroll) {
+                // console.log(`Scroll NEXT attempt blocked: isScrolling=${isScrolling}, canScroll=${canScroll}`);
+                if (!isScrolling) updateScrollability(); // Update arrows if scroll was blocked due to !canScroll
+                return;
+            }
+            // console.log("Scroll NEXT conditions met. Starting scroll NEXT...");
             isScrolling = true;
 
             const scrollAmount = testimonialWidth + gap;
-            clearTimeout(scrollEndTimer); // Clear any previous timer
+            clearTimeout(scrollEndTimer);
             testimonialsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-            // Set timeout ONLY for desktop to handle infinite loop reset
-            scrollEndTimer = setTimeout(handleScrollEnd, 500); // Adjust timeout duration if needed
+            scrollEndTimer = setTimeout(() => handleScrollEnd(true), 500);
         };
 
-        // Click Trigger on the WRAPPER (for desktop arrow)
+        // Click Trigger on the WRAPPER for arrows
         testimonialsWrapper.addEventListener('click', (event) => {
             const isMobile = mobileMediaQuery.matches;
-            if (isMobile) {
-                console.log("Click ignored on wrapper: Mobile device.");
-                return; // Ignore clicks on mobile
-            }
+            if (isMobile) return;
 
-            // Prevent clicks on buttons/links inside testimonials from triggering scroll
-            if (event.target.closest('.testimonial a, .testimonial button')) {
-                console.log("Clicked on a link/button inside testimonial, ignoring scroll trigger.");
+            // Check if the click is directly on the wrapper (where pseudo-elements are attached)
+            if (event.target !== testimonialsWrapper) {
+                // console.log("Clicked on a child, not the wrapper itself. Ignoring for arrow click.");
                 return;
             }
 
-            // Check if the click is within the area of the ::after pseudo-element (arrow)
             const wrapperRect = testimonialsWrapper.getBoundingClientRect();
-            // Use computed style to get arrow width dynamically if possible, fallback needed
-            const arrowComputedStyle = window.getComputedStyle(testimonialsWrapper, '::after');
-            const arrowWidth = parseFloat(arrowComputedStyle.width) || 35; // Fallback to 35px
-            const paddingRight = parseFloat(window.getComputedStyle(testimonialsWrapper).paddingRight);
+            const clickX = event.clientX; // Click position relative to viewport
 
-            // Calculate the rough horizontal start position of the arrow
-            // Arrow lives within padding, so check if click is to the right of content area start
-            const arrowStartsAt = wrapperRect.right - paddingRight; // Rough start
+            // Define sensitive areas for arrows (e.g., 50px from edge, adjust as needed)
+            // These values should roughly correspond to the size/padding of your CSS pseudo-elements.
+            const arrowSensitiveAreaWidth = 60; // px 
 
-            // Check if click is horizontally within the padding/arrow area on the right
-            if (event.clientX >= arrowStartsAt && event.clientX <= wrapperRect.right) {
-                 console.log("Click detected in arrow region.");
-                 scrollNext();
+            // Check for LEFT arrow click (::before)
+            // Click must be within the left part of the wrapper
+            if (clickX >= wrapperRect.left && clickX <= wrapperRect.left + arrowSensitiveAreaWidth) {
+                if (testimonialsWrapper.classList.contains('has-scroll-prev')) {
+                    // console.log("Click detected in PREV arrow region.");
+                    scrollPrev();
+                }
+            // Check for RIGHT arrow click (::after)
+            // Click must be within the right part of the wrapper
+            } else if (clickX <= wrapperRect.right && clickX >= wrapperRect.right - arrowSensitiveAreaWidth) {
+                if (testimonialsWrapper.classList.contains('has-scroll-next')) {
+                    // console.log("Click detected in NEXT arrow region.");
+                    scrollNext();
+                }
             }
         });
-
-        // Manual scroll detection for infinite loop reset
-        // This listener's core logic should only run on mobile now
-        let manualScrollTimer;
+        
+        // Manual scroll detection (e.g., mouse wheel, trackpad)
         testimonialsContainer.addEventListener('scroll', () => {
-            const isMobile = mobileMediaQuery.matches;
-            // Only run debounce for manual scrolls on mobile
-            // Ignore if on desktop OR if a programmatic scroll is happening
-            if (!isMobile || isScrolling) {
-                // Optional: console log for debugging if needed
-                // console.log(`Manual scroll listener ignored: isMobile=${isMobile}, isScrolling=${isScrolling}`);
-                return;
-            }
-            // Debounce manual scroll check (Mobile Only)
-            clearTimeout(manualScrollTimer);
-            // console.log("Manual scroll detected (Mobile). Setting timer for handleScrollEnd."); // Optional log
-            manualScrollTimer = setTimeout(handleScrollEnd, 150); // Short delay after manual scroll stops
-        });
+            clearTimeout(manualScrollDebounceTimer);
+            manualScrollDebounceTimer = setTimeout(() => {
+                if (isScrolling) {
+                    // If a programmatic scroll is happening, it will call handleScrollEnd (which calls updateScrollability).
+                    // console.log("Manual scroll event during programmatic scroll, deferring update.");
+                    return;
+                }
+                // console.log("Manual scroll finished. Updating arrows.");
+                updateScrollability(); // Update arrow states after manual scroll
+                
+                // For desktop, if manual scroll happens to hit the infinite loop point (less likely but possible)
+                const isMobile = mobileMediaQuery.matches;
+                if (!isMobile) {
+                    handleScrollEnd(false); // Check if loop reset is needed, pass false for non-programmatic
+                }
 
+            }, 150); // Adjust debounce time as needed (e.g., 150-250ms)
+        });
 
         // Resize Handling
         let resizeTimer;
@@ -347,14 +412,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Initial Setup
-        // Use setTimeout to ensure layout is likely stable
-        setTimeout(setupCarousel, 100);
+        // Use setTimeout to ensure layout is likely stable, especially for offsetWidth calculations
+        setTimeout(setupCarousel, 150); // Slightly increased delay
 
     } else {
         console.log("No testimonials found in the container.");
         // Ensure class is removed if no items initially
         if (testimonialsWrapper) { // Check if wrapper exists before modifying
-            testimonialsWrapper.classList.remove('has-scroll-next');
+            testimonialsWrapper.classList.remove('has-scroll-prev', 'has-scroll-next');
         }
     }
 
