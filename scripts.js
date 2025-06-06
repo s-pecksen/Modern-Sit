@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Send email to you
                 await emailjs.send(
                     'service_axisrmu',
-                    'template_9ocqgyf', // your notification template
+                    'template_9ocqgyf',
                     formData,
                     'ac87uG33mp4sHHHAy'
                 );
@@ -457,12 +457,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Send auto-reply to prospect
                 await emailjs.send(
                     'service_axisrmu',
-                    'template_v78oqjh', // your new auto-reply template ID
+                    'template_v78oqjh',
                     formData,
                     'ac87uG33mp4sHHHAy'
                 );
 
-                alert('Thank you for your inquiry! We will get back to you soon.');
+                // Show success message and hide the form
+                const successMsg = document.getElementById('form-success-message');
+                if (successMsg) {
+                    successMsg.style.display = 'block';
+                    form.style.display = 'none'; // Hide the form permanently after submission
+                }
                 form.reset();
             } catch (error) {
                 alert('Sorry, there was an error sending your message. Please try again later.');
