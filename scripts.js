@@ -423,4 +423,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Form submission handling
+    const form = document.getElementById('consultationForm');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                name: form.querySelector('input[name="name"]').value,
+                email: form.querySelector('input[name="email"]').value,
+                phone: form.querySelector('input[name="phone"]').value,
+                dates: form.querySelector('input[name="dates"]').value,
+                referral: form.querySelector('input[name="referral"]').value,
+                message: form.querySelector('textarea[name="message"]').value
+            };
+
+            // Show loading state
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
+
+            try {
+                // Send email to you
+                await emailjs.send(
+                    'service_axisrmu',
+                    'template_9ocqgyf', // your notification template
+                    formData,
+                    'ac87uG33mp4sHHHAy'
+                );
+
+                // Send auto-reply to prospect
+                await emailjs.send(
+                    'service_axisrmu',
+                    'template_v78oqjh', // your new auto-reply template ID
+                    formData,
+                    'ac87uG33mp4sHHHAy'
+                );
+
+                alert('Thank you for your inquiry! We will get back to you soon.');
+                form.reset();
+            } catch (error) {
+                alert('Sorry, there was an error sending your message. Please try again later.');
+                console.error('Error:', error);
+            } finally {
+                // Reset button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        });
+    }
+
 }); // End DOMContentLoaded

@@ -213,12 +213,13 @@
             </div>
         </section>
         <section id="contact">
-            <form>
+            <form id="consultationForm" onsubmit="return false;">
                 <h2>Book Your Free Consultation</h2>
                 <p>Let's see if we're a good fit for each other!</p>
                 <input type="text" name="name" placeholder="Your Name" required>
                 <input type="email" name="email" placeholder="Email Address" required>
                 <input type="tel" name="phone" placeholder="Your Phone Number" required>
+                <input type="text" name="referral" placeholder="How did you hear about us?" required>
                 <input type="text" name="dates" placeholder="Your House-Sit Dates (From & To)" required>
                 <textarea name="message" placeholder="Tell us about your pets" required></textarea>
                 <button type="submit">Submit</button>
@@ -235,6 +236,7 @@
             <p>&copy; 2025 Modern Sit Dog Care. All rights reserved.</p>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
