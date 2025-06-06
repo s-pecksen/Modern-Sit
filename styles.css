@@ -435,10 +435,10 @@ nav ul li a:hover::after {
 .testimonial-content {
     display: flex;
     flex-direction: column;
-    height: 100%; /* Ensure content takes full height */
-    position: relative; /* Needed for absolute positioning of pseudo-element */
-    padding-left: 20px; /* Add padding to make space for quote */
-    text-align: left; /* Add this to align text left */
+    height: auto; /* Changed from 100% to auto */
+    position: relative;
+    padding-left: 20px;
+    text-align: left;
 }
 
 .testimonial-content::before {
@@ -457,52 +457,50 @@ nav ul li a:hover::after {
 /* Style the new paragraph elements if needed (they might inherit fine) */
 .testimonial-preview,
 .testimonial-full {
-    font-size: 1.1em; /* Example: Inherit or set specific size */
-    line-height: 1.6; /* Example: Inherit or set specific line height */
-    margin-bottom: 20px; /* Example: Set spacing */
-    color: #555; /* Example: Set color */
-    flex-grow: 1; /* Allow text paragraphs to take space */
-    /* Ensure text is above pseudo-element */
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #555;
     position: relative;
     z-index: 1;
 }
 
 .read-more-btn {
-    background-color: transparent; /* Existing */
-    color: #3C78D8; /* Existing */
-    border: none; /* Existing */
-    padding: 0; /* Existing */
-    font-size: 0.9em; /* Existing */
-    font-weight: 600; /* Existing */
-    cursor: pointer; /* Existing */
-    margin-bottom: 15px; /* Existing */
-    transition: color 0.3s ease; /* Existing */
-    align-self: flex-start; /* Align button to the start */
+    background-color: transparent;
+    color: #3C78D8;
+    border: none;
+    padding: 0;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0 0 15px 0; /* Adjusted margin */
+    transition: color 0.3s ease;
+    align-self: flex-start;
 }
 
 .read-more-btn:hover {
-    color: #FF9966; /* Existing */
-    text-decoration: underline; /* Existing */
+    color: #FF9966;
+    text-decoration: underline;
 }
 
 .testimonial-author {
-    display: flex; /* Existing */
-    flex-direction: column; /* Existing */
-    align-items: flex-start; /* Existing */
-    margin-top: auto; /* Push author to the bottom */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 15px; /* Changed from auto to fixed margin */
 }
 
 .author-name {
-    font-weight: 700; /* Existing */
-    font-size: 1.1em; /* Existing */
-    margin: 0; /* Existing */
-    color: #2A4365; /* Existing */
+    font-weight: 700;
+    font-size: 1.1em;
+    margin: 0;
+    color: #2A4365;
 }
 
 .author-location {
-    font-size: 0.9em; /* Existing */
-    color: #777; /* Existing */
-    margin: 5px 0 0 0; /* Existing */
+    font-size: 0.9em;
+    color: #777;
+    margin: 5px 0 0 0;
 }
 
 /* NEW: Arrow Button styled on the WRAPPER */

@@ -41,37 +41,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Initial state: Show preview, hide full text
                 previewP.style.display = 'block';
                 fullP.style.display = 'none';
-                btn.textContent = 'Read more'; // Ensure button text is reset
+                btn.textContent = 'Read more';
                 btn.style.display = 'inline-block';
 
-                // Remove any old listener before adding a new one (important for re-initialization)
-                // A simple way for this specific case is to replace the button with its clone to remove listeners.
-                // However, since we are calling this on newly created clones or on initial setup, 
-                // we might not need to worry about old listeners IF this function is called correctly.
-                // For safety, let's ensure a fresh listener or handle re-binding carefully.
-                // A more robust way if elements are not replaced: btn.replaceWith(btn.cloneNode(true)); then re-select btn.
-                // For this case, we'll rely on it being called on fresh clones or once initially.
-                // If issues persist, explicit listener removal/re-cloning the button itself might be needed.
-
-                // Check if a listener already exists to avoid duplicates if not careful
-                if (!btn.hasReadMoreListener) { // Add a custom property to track
+                if (!btn.hasReadMoreListener) {
                     btn.addEventListener('click', () => {
                         const isExpanded = fullP.style.display === 'block';
                         if (isExpanded) {
                             fullP.style.display = 'none';
                             previewP.style.display = 'block';
                             btn.textContent = 'Read more';
+                            // Smoothly collapse the content
+                            contentContainer.style.height = previewP.offsetHeight + 'px';
+                            setTimeout(() => {
+                                contentContainer.style.height = 'auto';
+                            }, 300);
                         } else {
                             previewP.style.display = 'none';
                             fullP.style.display = 'block';
                             btn.textContent = 'Read less';
+                            // Smoothly expand the content
+                            contentContainer.style.height = fullP.offsetHeight + 'px';
+                            setTimeout(() => {
+                                contentContainer.style.height = 'auto';
+                            }, 300);
                         }
                     });
-                    btn.hasReadMoreListener = true; // Mark that listener is attached
+                    btn.hasReadMoreListener = true;
                 }
             } else {
                 if (previewP) previewP.style.display = 'block';
-                fullP.style.display = 'none'; // Ensure full is hidden if empty
+                fullP.style.display = 'none';
                 btn.style.display = 'none';
             }
         } else {
