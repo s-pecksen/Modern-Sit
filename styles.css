@@ -224,12 +224,58 @@ nav ul li a:hover::after {
 }
 
 .gallery {
+    padding: 80px 5%;
+    background-color: #fafbfc;
+    text-align: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.gallery::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('images/paw-pattern.png');
+    opacity: 0.03;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.gallery h2,
+.gallery .gallery-container {
+    position: relative;
+    z-index: 1;
+}
+
+.gallery h2 {
+    font-size: 2.2em;
+    margin-bottom: 50px;
+    color: #2A4365;
+    position: relative;
+    padding-bottom: 15px;
+    display: inline-block;
+}
+
+.gallery h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #FF9966;
+}
+
+.gallery-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 60px 20px;
-    background-color: #ffffff;
-    gap: 2rem;
+    gap: 2.5rem;
     flex-wrap: wrap;
 }
 
@@ -239,10 +285,11 @@ nav ul li a:hover::after {
     object-fit: cover;
     border-radius: 15px !important;
     transition: all 0.4s ease;
+    transform: scale(1);
 }
 
 .gallery .image-wrapper {
-    width: 30%;
+    width: 22%;
     max-height: 600px;
     border-radius: 15px;
     overflow: hidden;
@@ -251,14 +298,39 @@ nav ul li a:hover::after {
 }
 
 .gallery .image-wrapper:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.gallery .image-wrapper:hover img {
+    transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
     .gallery .image-wrapper {
         width: 100%;
         margin-bottom: 20px;
+    }
+    
+    .gallery-container {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .gallery h2 {
+        font-size: 1.8em;
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+    .gallery .image-wrapper {
+        width: 48%;
+        margin-bottom: 20px;
+    }
+    
+    .gallery-container {
+        justify-content: center;
     }
 }
 
@@ -325,8 +397,9 @@ nav ul li a:hover::after {
 
 .experience-images img {
     width: calc(50% - 0.75rem);
-    height: auto;
+    height: 400px;
     object-fit: cover;
+    object-position: left center;
     border-radius: 15px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     transition: all 0.4s ease;
